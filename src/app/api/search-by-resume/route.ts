@@ -74,7 +74,6 @@ export async function POST(req: NextRequest) {
       const arrayBuffer = await file.arrayBuffer()
       const buffer = Buffer.from(arrayBuffer)
       const parser = new PDFParse({ data: buffer })
-      await parser.load()
       const result = await parser.getText()
       rawText = result.text || ""
       await parser.destroy()

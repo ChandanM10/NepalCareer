@@ -1,0 +1,265 @@
+// AI Job Discovery Platform - Prisma Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// For local development, use:
+// DATABASE_URL="file:./dev.db"
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  password     String
+  fullName     String
+  headline     String?
+  bio          String?
+  avatarUrl    String?
+  role         String   @default("user") // "user" | "admin"
+  location     String?
+  whatsappNumber String? // E.164 like +97798XXXXXXXX
+  phoneCountry  String? @default("Nepal")
+  notifyWhatsapp Boolean @default(true)
+  notifyEmail   Boolean  @default(true)
+  notifyInApp   Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  resumes      Resume[]
+  savedJobs    SavedJob[]
+  applications Application[]
+  alerts       Alert[]
+  chatThreads  ChatThread[]
+  activities   Activity[]
+  watchSources WatchSource[]
+  notifications Notification[]
+}
+
+model Company {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  logoUrl       String?
+  website       String?
+  industry      String?
+  size          String? // "1-10", "11-50", "51-200", "201-1000", "1000+"
+  founded       Int?
+  headquarters  String?
+  description   String?
+  mission       String?
+  techStack     String   @default("[]") // JSON array of strings
+  benefits      String   @default("[]") // JSON array of strings
+  rating        Float    @default(0)
+  followerCount Int      @default(0)
+  jobCount      Int      @default(0)
+  verified      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  jobs Job[]
+}
+
+model Job {
+  id             String   @id @default(cuid())
+  title          String
+  slug           String   @unique
+  description    String
+  requirements   String   @default("[]") // JSON array
+  responsibilities String @default("[]") // JSON array
+  niceToHave     String   @default("[]") // JSON array
+  skills         String   @default("[]") // JSON array of skills
+  technologies   String   @default("[]") // JSON array
+  tags           String   @default("[]") // JSON array
+  category       String? // e.g. "Engineering", "Design", "Product", "Data", "Marketing"
+  subcategory    String?
+  companyId      String
+  location       String
+  city           String?
+  country        String?
+  region         String? // "Americas", "EMEA", "APAC"
+  remoteStatus   String   @default("onsite") // "remote" | "hybrid" | "onsite"
+  employmentType String   @default("full-time") // "full-time" | "part-time" | "contract" | "internship"
+  seniority      String?  // "intern" | "junior" | "mid" | "senior" | "lead" | "staff" | "director" | "vp" | "executive"
+  salaryMin      Int?
+  salaryMax      Int?
+  salaryCurrency String   @default("USD")
+  equity         String?
+  experienceYrs  Int?
+  visaSponsor    Boolean  @default(false)
+  featured       Boolean  @default(false)
+  urgent         Boolean  @default(false)
+  viewCount      Int      @default(0)
+  applicationCount Int    @default(0)
+  status         String   @default("open") // "open" | "closed" | "draft"
+  sourceUrl      String?
+  postedAt       DateTime @default(now())
+  closingAt      DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  company       Company       @relation(fields: [companyId], references: [id])
+  savedJobs     SavedJob[]
+  applications  Application[]
+
+  @@index([companyId])
+  @@index([category])
+  @@index([remoteStatus])
+  @@index([employmentType])
+  @@index([seniority])
+}
+
+model Resume {
+  id            String   @id @default(cuid())
+  userId        String
+  fileName      String
+  fileUrl       String?
+  rawText       String? // raw extracted text
+  isPrimary     Boolean  @default(false)
+  // AI-extracted structured data (JSON-encoded)
+  skills        String   @default("[]")
+  technologies  String   @default("[]")
+  experience    String   @default("[]") // array of { role, company, start, end, bullets }
+  education     String   @default("[]")
+  certifications String  @default("[]")
+  languages     String   @default("[]")
+  careerCategory String?
+  targetRole    String?
+  yearsExp      Int?
+  atsScore      Int?     // 0-100
+  strengths     String   @default("[]")
+  weaknesses    String   @default("[]")
+  improvementSuggestions String @default("[]") // JSON
+  analysisCompletedAt DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model SavedJob {
+  id        String   @id @default(cuid())
+  userId    String
+  jobId     String
+  note      String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, jobId])
+  @@index([userId])
+}
+
+model Application {
+  id          String   @id @default(cuid())
+  userId      String
+  jobId       String
+  status      String   @default("wishlist") // wishlist | applied | screening | interview | offer | rejected | accepted
+  coverLetter String?
+  resumeId    String?
+  appliedAt   DateTime?
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  notes       String? // JSON array of notes
+  stageHistory String  @default("[]") // JSON: [{status, at}]
+  rating      Int?     // candidate self-rating
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, jobId])
+  @@index([userId])
+  @@index([status])
+}
+
+model Alert {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  query     String   // search keywords
+  filters   String   @default("{}") // JSON: location, type, etc.
+  frequency String   @default("instant") // instant | daily | weekly
+  active    Boolean  @default(true)
+  lastTriggeredAt DateTime?
+  matchCount Int     @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model ChatThread {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String   @default("New Conversation")
+  messages  String   @default("[]") // JSON array of {role, content, ts}
+  context   String? // optional career context
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // "saved_job" | "applied" | "status_change" | "uploaded_resume" | "created_alert" | "ai_query"
+  title     String
+  meta      String   @default("{}") // JSON
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model WatchSource {
+  id            String   @id @default(cuid())
+  userId        String
+  companyName   String
+  url           String   // careers page URL
+  country       String   @default("Nepal")
+  industry      String?
+  lastCheckedAt DateTime?
+  lastJobCount  Int      @default(0)
+  newJobsCount  Int      @default(0)  // jobs added since last check
+  status        String   @default("active") // "active" | "paused" | "error"
+  lastError     String?
+  // Mock: list of "discovered" jobs (JSON array)
+  discoveredJobs String  @default("[]")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // "new_job_match" | "watch_source_new" | "application_update" | "test" | "system"
+  title     String
+  body      String
+  meta      String   @default("{}") // JSON
+  channels  String   @default("[]") // JSON array: ["in_app", "whatsapp", "email"]
+  deliveryLog String @default("[]") // JSON: [{ channel, status, at, message }]
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([read])
+}

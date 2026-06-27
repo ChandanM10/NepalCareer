@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="/screenshots/homepage.png" alt="NepalCareer Homepage" width="800">
+  <img src="/public/screenshots/homepage.png" alt="NepalCareer Homepage" width="800">
 </p>
 
 <h1 align="center">NepalCareer</h1>
@@ -31,18 +31,18 @@
 
 <table>
   <tr>
-    <td><img src="/screenshots/homepage.png" alt="Homepage" width="400"></td>
-    <td><img src="/screenshots/signup.png" alt="Sign Up" width="400"></td>
+    <td><img src="/public/screenshots/resume-job.png" alt="Homepage" width="400"></td>
+    <td><img src="/public/screenshots/jobtab.png" alt="Sign Up" width="400"></td>
   </tr>
   <tr>
-    <td align="center">Homepage</td>
-    <td align="center">Sign Up</td>
+    <td align="center">Search job by Resume</td>
+    <td align="center">Job Browser</td>
   </tr>
   <tr>
-    <td colspan="2"><img src="/screenshots/resume-job-search.png" alt="Resume Job Search" width="800"></td>
+    <td colspan="2"><img src="/public/screenshots/signup.png" alt="sign up page" width="800"></td>
   </tr>
   <tr>
-    <td colspan="2" align="center">Resume Job Search</td>
+    <td colspan="2" align="center">Signup Page</td>
   </tr>
 </table>
 

@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
       const arrayBuffer = await file.arrayBuffer()
       const data = new Uint8Array(arrayBuffer)
       const result = await extractText(data)
-      rawText = result.text || ""
+      rawText = (Array.isArray(result.text) ? result.text.join("\n") : result.text) || ""
     } catch (e: any) {
       return NextResponse.json({ error: `Failed to parse PDF: ${e?.message}` }, { status: 422 })
     }

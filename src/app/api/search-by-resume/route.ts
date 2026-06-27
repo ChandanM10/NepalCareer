@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { getSession } from "@/lib/auth"
 import { analyzeResume, localMatchScore } from "@/lib/ai"
+import { ensureDOMPolyfills } from "@/lib/pdf-polyfill"
+
+ensureDOMPolyfills()
 import { parseJsonArray } from "@/lib/format"
 
 export const dynamic = "force-dynamic"
@@ -70,7 +73,8 @@ export async function POST(req: NextRequest) {
   if (isPdf) {
     fileType = "pdf"
     try {
-      const { PDFParse } = await import("pdf-parse")
+      const mod = "pdf-parse"
+      const { PDFParse } = await import(mod)
       const arrayBuffer = await file.arrayBuffer()
       const buffer = Buffer.from(arrayBuffer)
       const parser = new PDFParse({ data: buffer })

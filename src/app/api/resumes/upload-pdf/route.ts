@@ -2,14 +2,13 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { getSession } from "@/lib/auth"
 import { analyzeResume } from "@/lib/ai"
+import { ensureDOMPolyfills } from "@/lib/pdf-polyfill"
 
 export const dynamic = "force-dynamic"
 export const runtime = "nodejs"
 
-/**
- * Extract text from an image (PNG/JPG) of a resume using the VLM (Vision Language Model).
- * Falls back to a placeholder if the VLM is unavailable.
- */
+ensureDOMPolyfills()
+
 async function extractTextFromImage(file: File): Promise<string> {
   try {
     const ZAI = (await import("z-ai-web-dev-sdk")).default
@@ -19,7 +18,6 @@ async function extractTextFromImage(file: File): Promise<string> {
     const mimeType = file.type || "image/png"
     const dataUrl = `data:${mimeType};base64,${base64}`
 
-    // Use a string content for vision models
     const response = await (zai.chat.completions.create as any)({
       messages: [
         {
@@ -43,7 +41,6 @@ async function extractTextFromImage(file: File): Promise<string> {
     return response.choices?.[0]?.message?.content || ""
   } catch (e: any) {
     console.error("VLM image extraction failed:", e?.message)
-    // Fallback: return empty string so the caller can show an error
     return ""
   }
 }
@@ -72,7 +69,8 @@ export async function POST(req: NextRequest) {
   if (isPdf) {
     fileType = "pdf"
     try {
-      const { PDFParse } = await import("pdf-parse")
+      const mod = "pdf-parse"
+      const { PDFParse } = await import(mod)
       const arrayBuffer = await file.arrayBuffer()
       const buffer = Buffer.from(arrayBuffer)
       const parser = new PDFParse({ data: buffer })

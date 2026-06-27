@@ -820,19 +820,22 @@ async function main() {
   await db.company.deleteMany()
   await db.user.deleteMany()
 
-  // Demo user — Chandan (admin), based in Nepal, with real WhatsApp + email
-  const passwordHash = await bcrypt.hash("changeme123", 12)
+  // Admin user — email, password, and phone from env vars
+  const adminEmail = process.env.ADMIN_EMAIL || "admin@example.com"
+  const adminPassword = process.env.ADMIN_PASSWORD || "changeme123"
+  const adminPhone = process.env.ADMIN_PHONE || "+9779800000000"
+  const passwordHash = await bcrypt.hash(adminPassword, 12)
   const user = await db.user.create({
     data: {
-      email: "admin@example.com",
+      email: adminEmail,
       password: passwordHash,
-      fullName: "Chandan",
+      fullName: "Admin",
       headline: "Admin · NepalCareer",
-      bio: "Admin account for NepalCareer. Looking for IT roles in Nepal and remote.",
+      bio: "Admin account for NepalCareer.",
       location: "Kathmandu, Nepal",
       avatarUrl: null,
       role: "admin",
-      whatsappNumber: "+9779800000000",
+      whatsappNumber: adminPhone,
       phoneCountry: "Nepal",
       notifyWhatsapp: true,
       notifyEmail: true,

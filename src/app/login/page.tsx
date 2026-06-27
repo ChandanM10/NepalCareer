@@ -56,11 +56,6 @@ function LoginForm() {
     })
   }
 
-  const fillAdmin = () => {
-    setEmail("admin@example.com")
-    setPassword("changeme123")
-  }
-
   return (
     <div className="w-full max-w-md">
       <Link href="/" className="inline-flex items-center gap-2 mb-8">
@@ -136,12 +131,9 @@ function LoginForm() {
           <Shield className="h-3.5 w-3.5 text-primary" />
           <span className="text-xs font-semibold">Admin access</span>
         </div>
-        <p className="text-[11px] text-muted-foreground mb-2">
-          Use the admin account to manage jobs and view all applications.
+        <p className="text-[11px] text-muted-foreground">
+          Sign in with your admin credentials to manage jobs and view all applications.
         </p>
-        <Button type="button" variant="outline" size="sm" onClick={fillAdmin} className="w-full text-xs gap-1.5">
-          <Shield className="h-3 w-3" /> Auto-fill admin credentials
-        </Button>
       </div>
 
       <p className="mt-6 text-center text-sm text-muted-foreground">

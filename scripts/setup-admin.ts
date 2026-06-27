@@ -13,9 +13,9 @@ const BCRYPT_ROUNDS = 12
 async function setupAdmin() {
   console.log("🔐 Setting up admin account...")
 
-  const email = "admin@example.com"
-  const plainPassword = "changeme123"
-  const fullName = "Chandan Singh"
+  const email = process.env.ADMIN_EMAIL || "admin@example.com"
+  const plainPassword = process.env.ADMIN_PASSWORD || "changeme123"
+  const fullName = process.env.ADMIN_NAME || "Admin"
 
   try {
     // Hash the password using bcrypt

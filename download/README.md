@@ -45,11 +45,8 @@ Nepal's AI-powered job platform. Find IT jobs in Kathmandu and across Nepal.
 
 ### Login Credentials
 
-- **Email:** `admin@example.com`
-- **Password:** `changeme123`
-- **Role:** Admin (full access to recruiter dashboard)
-
-Or click "Auto-fill admin credentials" on the login page.
+Set `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and `ADMIN_PHONE` in your `.env` file
+before running the seed script, then sign in with those credentials.
 
 ---
 

@@ -49,12 +49,9 @@ export function AppFooter() {
             </div>
           </div>
         </div>
-        <div className="mt-8 pt-6 border-t border-border/60 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+        <div className="mt-8 pt-6 border-t border-border/60 flex items-center justify-center">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} NepalCareer. Built with Next.js, Prisma, and z-ai-web-dev-sdk.
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Demo data is synthetic. Real job postings and credentials are not stored.
+            © {new Date().getFullYear()} NepalCareer.
           </p>
         </div>
       </div>

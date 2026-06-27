@@ -3,6 +3,7 @@
  * Creates 25+ companies and 60+ jobs across multiple categories, plus a demo user.
  */
 import { db } from "../src/lib/db"
+import * as bcrypt from "bcrypt"
 import type { Company } from "@prisma/client"
 
 function daysAgo(days: number): Date {
@@ -820,7 +821,7 @@ async function main() {
   await db.user.deleteMany()
 
   // Demo user — Chandan (admin), based in Nepal, with real WhatsApp + email
-  const passwordHash = Buffer.from("changeme123").toString("base64")
+  const passwordHash = await bcrypt.hash("changeme123", 12)
   const user = await db.user.create({
     data: {
       email: "admin@example.com",

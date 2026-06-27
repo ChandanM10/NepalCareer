@@ -72,24 +72,14 @@ export async function POST(req: NextRequest) {
   if (isPdf) {
     fileType = "pdf"
     try {
-      const path = await import("path")
-      const pdfjs: any = await import("pdfjs-dist/legacy/build/pdf.mjs")
-      const workerPath = path.join(process.cwd(), "node_modules/pdfjs-dist/legacy/build/pdf.worker.min.mjs")
-      const { pathToFileURL } = await import("url")
-      pdfjs.GlobalWorkerOptions.workerSrc = pathToFileURL(workerPath).href
+      const { PDFParse } = await import("pdf-parse")
       const arrayBuffer = await file.arrayBuffer()
-      const data = new Uint8Array(arrayBuffer)
-      const loadingTask = pdfjs.getDocument({ data, isEvalSupported: false, useSystemFonts: true })
-      const pdf = await loadingTask.promise
-      let fullText = ""
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i)
-        const textContent = await page.getTextContent()
-        const strings = textContent.items.map((item: any) => item.str)
-        fullText += strings.join(" ") + "\n"
-      }
-      await pdf.destroy()
-      rawText = fullText
+      const buffer = Buffer.from(arrayBuffer)
+      const parser = new PDFParse({ buffer })
+      await parser.load()
+      const result = await parser.getText()
+      rawText = result.text || ""
+      await parser.destroy()
     } catch (e: any) {
       console.error("PDF parse error:", e)
       return NextResponse.json({ error: `Failed to parse PDF: ${e?.message || "unknown"}` }, { status: 422 })
